@@ -32,7 +32,7 @@ def useful_state(obs,env):
 def evaluate(env,
                  load_path="",
                  logs_path=None,
-                 nb_episode=1,
+                 nb_episode=10,
                  nb_process=None,
                  max_steps=-1,
                  verbose=False,
@@ -84,7 +84,7 @@ def evaluate(env,
     run(runner_params,nb_episode,logs_path,max_steps,agent,save_gif,agent_name)
 if __name__ == "__main__":
 
-    NB_EPISODE = 1
+    NB_EPISODE = 10
     agent_log_path = "agents_log" # name of the folder to save the performance of the agent
     agent_nn_weights_name = "grid2op_14_a3c"
     name_of_RL_agent = "agent_1"
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     # cr.initialize(env)
 
     # Get the size of state space and action space.
-    do_nothing_act = env.helper_action_player({})
+    do_nothing_act = env._helper_action_player({})
     obs, reward, done, info = env.step(do_nothing_act)
     state_trimmed = useful_state(obs,env)
     state_trimmed = state_trimmed.reshape([1,state_trimmed.size])
@@ -132,13 +132,13 @@ if __name__ == "__main__":
     # Debug prints
     print("Debug prints --->:")
     print("Chronics location that being used:", env.chronics_handler.path)
-    print("Grid location being used:", env.init_grid_path)
-    print("Reward class that is being used:", env.rewardClass)
-    print("Action type class being used:", env.actionClass)
-    print("Observation type class being used:", env.observationClass)
-    print("Backend CSV file key names:", env.names_chronics_to_backend)
-    print("Legal action class being used:", env.legalActClass)
-    print("Voltage controller class being used:", env.voltagecontrolerClass)
+    print("Grid location being used:", env._init_grid_path)
+    print("Reward class that is being used:", env._rewardClass)
+    print("Action type class being used:", env._actionClass)
+    print("Observation type class being used:", env._observationClass)
+    print("Backend CSV file key names:", env._names_chronics_to_backend)
+    print("Legal action class being used:", env._legalActClass)
+    print("Voltage controller class being used:", env._voltagecontrolerClass)
 
     evaluate(env=env,
              load_path=load_path,

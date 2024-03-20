@@ -163,9 +163,43 @@ class A3CAgent(MLAgent):
     # make loss function for Policy Gradient
     # [log(action probability) * advantages] will be input for the back prop
     # we add entropy of action probability to loss
+    # def actor_optimizer(self):
+    #     action = K.placeholder(shape=(None, self.action_size))
+    #     advantages = K.placeholder(shape=(None, ))
+    #
+    #     policy = self.actor.output
+    #
+    #     good_prob = K.sum(action * policy, axis=1)
+    #     eligibility = K.log(good_prob + 1e-10) * K.stop_gradient(advantages)
+    #     loss = -K.sum(eligibility)
+    #
+    #     entropy = K.sum(policy * K.log(policy + 1e-10), axis=1)
+    #
+    #     actor_loss = loss + 0.01*entropy
+    #
+    #     #optimizer = Adam(lr=self.actor_lr)
+    #     optimizer = tf.keras.optimizers.Adam(learning_rate=self.actor_lr)
+    #     # updates = optimizer.get_updates(params=self.actor.trainable_weights, constraints=[],loss=actor_loss)
+    #     updates = optimizer.get_updates(params=self.actor.trainable_weights, loss=actor_loss)
+    #     train = K.function([self.actor.input, action, advantages], tf.compat.v1.convert_to_tensor([]),updates=updates)
+    #
+    # # make loss function for Value approximation
+    # def critic_optimizer(self):
+    #     discounted_reward = K.placeholder(shape=(None, ))
+    #
+    #     value = self.critic.output
+    #
+    #     loss = K.mean(K.square(discounted_reward - value))
+    #
+    #     optimizer = Adam(lr=self.critic_lr)
+    #     # updates = optimizer.get_updates(params=self.critic.trainable_weights, constraints=[],loss=loss)
+    #     updates = optimizer.get_updates(params=self.critic.trainable_weights, loss=loss)
+    #     train = K.function([self.critic.input, discounted_reward], tf.compat.v1.convert_to_tensor([]), updates=updates)
+    #     return train
+
     def actor_optimizer(self):
         action = K.placeholder(shape=(None, self.action_size))
-        advantages = K.placeholder(shape=(None, ))
+        advantages = K.placeholder(shape=(None,))
 
         policy = self.actor.output
 
@@ -175,26 +209,28 @@ class A3CAgent(MLAgent):
 
         entropy = K.sum(policy * K.log(policy + 1e-10), axis=1)
 
-        actor_loss = loss + 0.01*entropy
+        actor_loss = loss + 0.01 * entropy
 
-        optimizer = Adam(lr=self.actor_lr)
-        # updates = optimizer.get_updates(params=self.actor.trainable_weights, constraints=[],loss=actor_loss)
-        updates = optimizer.get_updates(params=self.actor.trainable_weights, loss=actor_loss)
-        train = K.function([self.actor.input, action, advantages], tf.compat.v1.convert_to_tensor([]),updates=updates)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=self.actor_lr)
+        gradients = tf.gradients(actor_loss, self.actor.trainable_weights)
+        grads_and_vars = zip(gradients, self.actor.trainable_weights)
+        optimizer.apply_gradients(grads_and_vars)
+        train = K.function([self.actor.input, action, advantages], outputs=[K.constant([0,1])], updates=[])
         return train
 
-    # make loss function for Value approximation
+    # 定义 Critic 的优化器
     def critic_optimizer(self):
-        discounted_reward = K.placeholder(shape=(None, ))
+        discounted_reward = K.placeholder(shape=(None,))
 
         value = self.critic.output
 
         loss = K.mean(K.square(discounted_reward - value))
 
-        optimizer = Adam(lr=self.critic_lr)
-        # updates = optimizer.get_updates(params=self.critic.trainable_weights, constraints=[],loss=loss)
-        updates = optimizer.get_updates(params=self.critic.trainable_weights, loss=loss)
-        train = K.function([self.critic.input, discounted_reward], tf.compat.v1.convert_to_tensor([]), updates=updates)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=self.critic_lr)
+        gradients = tf.gradients(loss, self.critic.trainable_weights)
+        grads_and_vars = zip(gradients, self.critic.trainable_weights)
+        optimizer.apply_gradients(grads_and_vars)
+        train = K.function([self.critic.input, discounted_reward], outputs=[K.constant([0,1])], updates=[])
         return train
 
     # make agents(local) and start training
@@ -252,7 +288,7 @@ class Agent(threading.Thread):
         global episode
         episode = 0
         env = set_environement(self.index,self.env_name,self.profiles_chronics)
-        self.action_space = env.helper_action_player
+        self.action_space = env._helper_action_player
         while episode < EPISODES_train:
             state = env.reset()
             state_as_dict = copy.deepcopy(state)

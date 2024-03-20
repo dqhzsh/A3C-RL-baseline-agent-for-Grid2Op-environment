@@ -4,7 +4,7 @@ from grid2op import make
 # name of the folder to save the performance of the agent.
 agent_log_path = "agents_log"
 # Path where the grid2viz is downlaoded and installed using "git clone" and "pip install -U ."
-grid2viz_location = f"C:Users\kisha\Grid2Viz\grid2viz"
+grid2viz_location = f"C:Users\dqh\grid2Viz\grid2viz"
 
 # In my case, the agent .npz data is located in the same location as this .py file.
 AGENTS_PATH = os.path.join(os.getcwd(),agent_log_path)

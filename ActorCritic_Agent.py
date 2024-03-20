@@ -6,6 +6,7 @@ try:
     import json
     import copy
     import os
+    import sys
     from grid2op import make
     from grid2op.Agent import MLAgent
     from grid2op.Environment import Environment
@@ -24,7 +25,8 @@ except:
     print(sys.exc_info())
     exit()
 
-import l2rpn_baselines.Multithreading_agent.user_environment_make
+#import l2rpn_baselines.Multithreading_agent.user_environment_make
+from l2rpn_baselines.AsynchronousActorCritic.user_environment_make import set_environement
 # import user_environment_make
 
 # Create the Agent instance here that can used with the Runner to test the performance of the trained RL agent.
@@ -251,7 +253,8 @@ class Agent(threading.Thread):
     def run(self):
         global episode
         episode = 0
-        env = user_environment_make.set_environement(self.index,self.env_name,self.profiles_chronics)
+        #env = user_environment_make.set_environement(self.index,self.env_name,self.profiles_chronics)
+        env = set_environement(self.index, self.env_name, self.profiles_chronics)
         self.action_space = env.helper_action_player
         while episode < EPISODES_train:
             state = env.reset()

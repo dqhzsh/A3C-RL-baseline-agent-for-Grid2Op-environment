@@ -55,7 +55,7 @@ def train(env,name,iterations,save_path,load_path,env_name,profiles_chronics,tim
     env_temp = set_environement(None, env_name, profiles_chronics)
 
     # Define the size of state space and action space.
-    do_nothing_act = env_temp.helper_action_player({})
+    do_nothing_act = env_temp._helper_action_player({})
 
     obs, reward, done, info = env_temp.step(do_nothing_act)
     #conversion parameter
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # Name of the ".h5" files that stores the actor and critic neural network weights.
     name = "grid2op_14_a3c"
     # Total number of episodes to train the A3C agent.
-    EPISODES_train = 500
+    EPISODES_train = 100000
     # Maximum number of time steps or iterations taken in each episode during the training.
     time_step_end = 3000
     # Number of parallel workers or threads to train the A3C agent.
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     # Name of the Grid2Op environment to train the A3C RL agent on.
     env_name = 'l2rpn_case14_sandbox'
     # Location of the chronic files. Change this to your chronics location.
-    profiles_chronics = r"C:\Users\kisha\data_grid2op\l2rpn_case14_sandbox\chronics"
+    profiles_chronics = r"C:\Users\dqh\data_grid2op\l2rpn_case14_sandbox\chronics"
     print("_____________________________________________")
     print("NOTE: PLEASE MAKE CHANGES TO THE FILE user_environment_make.py TO MAKE YOUR ENVIRONMENT. This "
           "user_environment_make.py will be called wherever it is necessary when training the A3C agent")
